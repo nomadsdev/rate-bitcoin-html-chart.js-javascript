@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Bitcoin</title>
+</head>
+<body>
+
+    <div>
+        <canvas id="myChart"></canvas>
+    </div>
+      
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        async function getBitcoinRates() {
+            try {
+                const response = await fetch('https://api.coindesk.com/v1/bpi/historical/close.json?limit=10');
+                const data = await response.json();
+
+                console.log(data);
+
+                return Object.values(data.bpi);
+            } catch (error) {
+                console.error('Error fetching Bitcoin rates:', error);
+                return null;
+            }
+        }
+
+        async function updateChart() {
+            const ctx = document.getElementById('myChart');
+            const bitcoinRates = await getBitcoinRates();
+
+            if (bitcoinRates !== null) {
+                const labels = Object.keys(bitcoinRates);
+                const dataValues = Object.values(bitcoinRates);
+
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'USD Exchange Rate for BTC (Last 10 Minutes)',
+                            data: dataValues,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        updateChart();
+    </script>      
+    
+</body>
+</html>
